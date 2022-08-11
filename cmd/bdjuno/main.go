@@ -16,7 +16,7 @@ import (
 	"github.com/forbole/bdjuno/v3/database"
 	"github.com/forbole/bdjuno/v3/modules"
 
-	gaiaapp "github.com/cosmos/gaia/v7/app"
+	saturnapp "github.com/dreanity/saturn/app"
 )
 
 func main() {
@@ -55,7 +55,7 @@ func main() {
 // This should be edited by custom implementations if needed.
 func getBasicManagers() []module.BasicManager {
 	return []module.BasicManager{
-		gaiaapp.ModuleBasics,
+		saturnapp.ModuleBasics,
 	}
 }
 
