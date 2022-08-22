@@ -7,10 +7,6 @@ import (
 	dbutils "github.com/forbole/bdjuno/v3/database/utils"
 )
 
-const (
-	maxPostgreSQLParams = 65535
-)
-
 func (db *Db) SaveRandomnessChainInfo(chainInfo randomnesstypes.ChainInfo) error {
 	stmt := `
 INSERT INTO randomness_chain_info (public_key, period, genesis_time, hash) 

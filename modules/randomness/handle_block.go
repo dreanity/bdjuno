@@ -4,8 +4,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	juno "github.com/forbole/juno/v3/types"
 
-	// abci "github.com/tendermint/tendermint/abci/types"
 	randomnesstypes "github.com/dreanity/saturn/x/randomness/types"
+	abci "github.com/tendermint/tendermint/abci/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 )
 
@@ -13,9 +13,15 @@ import (
 func (m *Module) HandleBlock(
 	block *tmctypes.ResultBlock, res *tmctypes.ResultBlockResults, txs []*juno.Tx, vals *tmctypes.ResultValidators,
 ) error {
-	// events := new([]abci.Event)
+	var events []abci.Event
 
-	for _, event := range res.BeginBlockEvents {
+	events = append(events, res.BeginBlockEvents...)
+
+	for _, tx := range txs {
+		events = append(events, tx.Events...)
+	}
+
+	for _, event := range events {
 		msg, err := sdk.ParseTypedEvent(event)
 		if err != nil {
 			return err
