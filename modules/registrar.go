@@ -28,6 +28,7 @@ import (
 	"github.com/forbole/bdjuno/v3/modules/mint"
 	"github.com/forbole/bdjuno/v3/modules/modules"
 	"github.com/forbole/bdjuno/v3/modules/pricefeed"
+	"github.com/forbole/bdjuno/v3/modules/randomness"
 	"github.com/forbole/bdjuno/v3/modules/staking"
 )
 
@@ -81,6 +82,7 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 	slashingModule := slashing.NewModule(sources.SlashingSource, cdc, db)
 	stakingModule := staking.NewModule(sources.StakingSource, cdc, db)
 	govModule := gov.NewModule(sources.GovSource, authModule, distrModule, mintModule, slashingModule, stakingModule, cdc, db)
+	randomnessModule := randomness.NewModule(cdc, db)
 
 	return []jmodules.Module{
 		messages.NewModule(r.parser, cdc, ctx.Database),
@@ -99,5 +101,6 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 		pricefeed.NewModule(ctx.JunoConfig, cdc, db),
 		slashingModule,
 		stakingModule,
+		randomnessModule,
 	}
 }
