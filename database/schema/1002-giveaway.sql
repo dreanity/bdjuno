@@ -7,5 +7,7 @@ CREATE TABLE giveaway
 	"completion_height" BIGINT NOT NULL,
 	"winning_ticket_numbers" INT[] NOT NULL,
 	"prizes" JSONB NOT NULL,
-	"status" smallint NOT NULL
+	"status" SMALLINT NOT NULL,
+	"ticket_count" INT NOT NULL,
+	"randomnessRound" BIGINT 
 )

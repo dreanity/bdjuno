@@ -6,16 +6,12 @@ CREATE TABLE randomness_chain_info
 	"genesis_time" BIGINT NOT NULL
 )
 
-CREATE TABLE unproven_randomness
-(
-	"round" BIGINT NOT NULL PRIMARY KEY
-)
-
-CREATE TABLE proven_randomness
+CREATE TABLE randomness
 (
 	"round" 			 BIGINT NOT NULL PRIMARY KEY,
-	"randomness" 		 TEXT NOT NULL,
-	"signature" 		 TEXT NOT NULL,
-	"previous_signature" TEXT NOT NULL
+	"round_time" 		 BIGINT NOT NULL,
+	"randomness" 		 TEXT,
+	"signature" 		 TEXT,
+	"previous_signature" TEXT
 )
 

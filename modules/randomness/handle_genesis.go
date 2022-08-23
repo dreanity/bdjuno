@@ -25,12 +25,12 @@ func (m *Module) HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json
 		return fmt.Errorf("error while storing genesis randomness chain info: %s", err)
 	}
 
-	err = m.db.SaveUnprovenRandomnessList(genState.UnprovenRandomnessList)
+	err = m.db.SaveUnprovenRandomnessListFromGenesis(genState.UnprovenRandomnessList)
 	if err != nil {
 		return fmt.Errorf("error while storing genesis unproven randomness list: %s", err)
 	}
 
-	err = m.db.SaveProvenRandomnessList(genState.ProvenRandomnessList)
+	err = m.db.SaveProvenRandomnessListFromGenesis(genState.ProvenRandomnessList)
 	if err != nil {
 		return fmt.Errorf("error while storing genesis proven randomness list: %s", err)
 	}

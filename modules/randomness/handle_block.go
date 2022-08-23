@@ -3,6 +3,7 @@ package randomness
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	juno "github.com/forbole/juno/v3/types"
+	"github.com/gogo/protobuf/proto"
 
 	randomnesstypes "github.com/dreanity/saturn/x/randomness/types"
 	abci "github.com/tendermint/tendermint/abci/types"
@@ -22,6 +23,11 @@ func (m *Module) HandleBlock(
 	}
 
 	for _, event := range events {
+		concreteGoType := proto.MessageType(event.Type)
+		if concreteGoType == nil {
+			continue
+		}
+
 		msg, err := sdk.ParseTypedEvent(event)
 		if err != nil {
 			return err
