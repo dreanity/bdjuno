@@ -23,5 +23,10 @@ func (m *Module) HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json
 		return fmt.Errorf("error while storing genesis giveaway list: %s", err)
 	}
 
+	err = m.db.SaveTicketListFromGenesis(genState.TicketList)
+	if err != nil {
+		return fmt.Errorf("error while storing genesis ticket list: %s", err)
+	}
+
 	return nil
 }

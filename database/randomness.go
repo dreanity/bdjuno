@@ -47,21 +47,6 @@ func (db *Db) SaveUnprovenRandomnessListFromGenesis(unprovenRandomnessList []ran
 	return nil
 }
 
-func (db *Db) SaveUnprovenRandomnessFromEvent(event *randomnesstypes.UnprovenRandomnessCreated) error {
-	stmt := `INSERT INTO unproven_randomness (round, round_time) VALUES ($1, $2)
-ON CONFLICT (round) DO UPDATE 
-    SET round = excluded.round,
-		round_time = excluded.round_time
-WHERE unproven_randomness.round = excluded.round`
-
-	_, err := db.Sql.Exec(stmt, event.Round, event.RoundTime)
-	if err != nil {
-		return fmt.Errorf("error while storing unproven randomness from event: %s", err)
-	}
-
-	return nil
-}
-
 func (db *Db) saveUnprovenRandomnessList(paramsNumber int, unprovenRandomnessList []randomnesstypes.UnprovenRandomness) error {
 	if len(unprovenRandomnessList) == 0 {
 		return nil
@@ -138,6 +123,8 @@ func (db *Db) saveProvenRandomnessList(paramsNumber int, provenRandomnessList []
 	return nil
 }
 
+// -------------------------------------------------------------------------------------------------
+
 func (db *Db) SaveProvenRandomnessFromEvent(event *randomnesstypes.ProvenRandomnessCreated) error {
 	stmt := `INSERT INTO randomness (round, randomness, signature, previous_signature, round_time) VALUES ($1, $2, $3, $4, $5) 
 ON CONFLICT (round) DO UPDATE 
@@ -157,3 +144,18 @@ WHERE randomness.round = excluded.round`
 }
 
 // -----------------------------------------------------------
+
+func (db *Db) SaveUnprovenRandomnessFromEvent(event *randomnesstypes.UnprovenRandomnessCreated) error {
+	stmt := `INSERT INTO randomness (round, round_time) VALUES ($1, $2)
+ON CONFLICT (round) DO UPDATE 
+    SET round = excluded.round,
+		round_time = excluded.round_time
+WHERE randomness.round = excluded.round`
+
+	_, err := db.Sql.Exec(stmt, event.Round, event.RoundTime)
+	if err != nil {
+		return fmt.Errorf("error while storing randomness from event: %s", err)
+	}
+
+	return nil
+}

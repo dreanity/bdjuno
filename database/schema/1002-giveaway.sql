@@ -1,6 +1,6 @@
 CREATE TABLE giveaway 
 (
-	"index" BIGINT NOT NULL PRIMARY KEY,
+	"index" INT NOT NULL PRIMARY KEY,
 	"duration" BIGINT NOT NULL,
 	"created_at" BIGINT NOT NULL,
 	"name" TEXT NOT NULL,
@@ -9,5 +9,17 @@ CREATE TABLE giveaway
 	"prizes" JSONB NOT NULL,
 	"status" SMALLINT NOT NULL,
 	"ticket_count" INT NOT NULL,
-	"randomness_round" BIGINT 
+	"randomness_round" BIGINT,
+
+	CONSTRAINT FK_giveaways_randomness FOREIGN KEY("randomness_round") REFERENCES randomness("round")
+)
+
+CREATE TABLE ticket 
+(
+	"index" INT NOT NULL PRIMARY KEY,
+	"giveaway_id" INT,
+	"participant_id" TEXT NOT NULL,
+	"participant_name" TEXT NOT NULL,
+
+	CONSTRAINT FK_tickets_giveaway FOREIGN KEY("giveaway_id") REFERENCES giveaway("index")
 )

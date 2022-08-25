@@ -95,6 +95,64 @@ func (db *Db) saveGiveawayList(paramsNumber int, giveawayList []giveawaytypes.Gi
 	return nil
 }
 
+// -------------------------------------------------------------
+
+func (db *Db) SaveTicketListFromGenesis(ticketList []giveawaytypes.Ticket) error {
+	paramsNumber := 4
+	slices := dbutils.SplitTicketList(ticketList, paramsNumber)
+
+	for _, list := range slices {
+		if len(list) == 0 {
+			continue
+		}
+
+		// Store up-to-date data
+		err := db.saveTicketList(paramsNumber, list)
+		if err != nil {
+			return fmt.Errorf("error while storing unproven randomness list: %s", err)
+		}
+	}
+
+	return nil
+}
+
+func (db *Db) saveTicketList(paramsNumber int, ticketList []giveawaytypes.Ticket) error {
+	if len(ticketList) == 0 {
+		return nil
+	}
+
+	stmt := `INSERT INTO ticket (
+		index, 
+		giveaway_id,
+		participant_id,
+		participant_name
+	) VALUES `
+
+	var params []interface{}
+	for i, ticket := range ticketList {
+		ai := i * paramsNumber
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d),",
+			ai+1, ai+2, ai+3, ai+4)
+
+		params = append(
+			params,
+			ticket.Index,
+			ticket.GiveawayId,
+			ticket.ParticipantId,
+			ticket.ParticipantName,
+		)
+	}
+
+	stmt = stmt[:len(stmt)-1]
+	stmt += " ON CONFLICT DO NOTHING"
+	_, err := db.Sql.Exec(stmt, params...)
+	if err != nil {
+		return fmt.Errorf("error while storing ticket list: %s", err)
+	}
+
+	return nil
+}
+
 // ----------------------------------------------------
 
 func (db *Db) SaveGiveawayFromGiveawayCreatedEvent(event *giveawaytypes.GiveawayCreated) error {
@@ -161,7 +219,7 @@ func (db *Db) UpdateGiveawayFromWinnersDeterminationBegunEvent(event *giveawayty
 		status = $2,
 		randomness_round = $3
 WHERE giveaway.index = $1`
-	fmt.Println("WINNERS DETERMINATION")
+
 	_, err := db.Sql.Exec(stmt,
 		event.GiveawayId,
 		1,
@@ -184,7 +242,7 @@ WHERE giveaway.index = $1`
 
 	_, err := db.Sql.Exec(stmt,
 		event.GiveawayId,
-		1,
+		3,
 	)
 	if err != nil {
 		return fmt.Errorf("error while updating giveaway from cancelled insuf tickets event: %s", err)
@@ -198,15 +256,23 @@ WHERE giveaway.index = $1`
 func (db *Db) UpdateGiveawayFromWinnersDeterminedEvent(event *giveawaytypes.GiveawayWinnersDetermined) error {
 	stmt := `UPDATE giveaway 
     SET index = $1,
-		winning_ticket_numbers = $2
+		winning_ticket_numbers = $2,
+		status = $3
 WHERE giveaway.index = $1`
+
+	winningTicketNumbersInt := make([]int32, 0)
+
+	for _, winningTicketNumber := range event.WinnersNumbers {
+		winningTicketNumbersInt = append(winningTicketNumbersInt, int32(winningTicketNumber))
+	}
 
 	_, err := db.Sql.Exec(stmt,
 		event.GiveawayId,
-		event.WinnersNumbers,
+		pq.Int32Array(winningTicketNumbersInt),
+		2,
 	)
 	if err != nil {
-		return fmt.Errorf("error while updating giveaway from cancelled insuf tickets event: %s", err)
+		return fmt.Errorf("error while updating giveaway from winners determined event: %s", err)
 	}
 
 	return nil
