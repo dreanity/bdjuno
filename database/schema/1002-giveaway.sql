@@ -9,5 +9,5 @@ CREATE TABLE giveaway
 	"prizes" JSONB NOT NULL,
 	"status" SMALLINT NOT NULL,
 	"ticket_count" INT NOT NULL,
-	"randomnessRound" BIGINT 
+	"randomness_round" BIGINT 
 )

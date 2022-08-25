@@ -9,8 +9,8 @@ import (
 	"github.com/lib/pq"
 )
 
-func (db *Db) SaveGiveawayList(giveawayList []giveawaytypes.Giveaway, ticketCountList []giveawaytypes.TicketCount) error {
-	paramsNumber := 9
+func (db *Db) SaveGiveawayListFromGenesis(giveawayList []giveawaytypes.Giveaway, ticketCountList []giveawaytypes.TicketCount) error {
+	paramsNumber := 10
 	slices := dbutils.SplitGiveawayList(giveawayList, paramsNumber)
 
 	for _, list := range slices {
@@ -42,14 +42,15 @@ func (db *Db) saveGiveawayList(paramsNumber int, giveawayList []giveawaytypes.Gi
 		winning_ticket_numbers, 
 		prizes, 
 		status,
-		ticket_count
+		ticket_count,
+		randomness_round
 	) VALUES `
 
 	var params []interface{}
 	for i, giveaway := range giveawayList {
 		ai := i * paramsNumber
-		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),",
-			ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8, ai+9)
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),",
+			ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8, ai+9, ai+10)
 
 		winningTicketNumbersInt := make([]int32, 0)
 
@@ -80,6 +81,7 @@ func (db *Db) saveGiveawayList(paramsNumber int, giveawayList []giveawaytypes.Gi
 			string(prizesJSONBytes),
 			giveaway.Status,
 			ticketCount,
+			nil,
 		)
 	}
 
@@ -95,7 +97,7 @@ func (db *Db) saveGiveawayList(paramsNumber int, giveawayList []giveawaytypes.Gi
 
 // ----------------------------------------------------
 
-func (db *Db) SaveGiveawayFromEvent(event *giveawaytypes.GiveawayCreated) error {
+func (db *Db) SaveGiveawayFromGiveawayCreatedEvent(event *giveawaytypes.GiveawayCreated) error {
 	stmt := `INSERT INTO giveaway (
 		index, 
 		duration, 
@@ -105,9 +107,10 @@ func (db *Db) SaveGiveawayFromEvent(event *giveawaytypes.GiveawayCreated) error 
 		winning_ticket_numbers, 
 		prizes, 
 		status,
-		ticket_count
-	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-ON CONFLICT (round) DO UPDATE 
+		ticket_count,
+		randomness_round
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+ON CONFLICT (index) DO UPDATE 
     SET index = excluded.index,
         duration = excluded.duration,
 		created_at = excluded.created_at,
@@ -116,7 +119,8 @@ ON CONFLICT (round) DO UPDATE
 		winning_ticket_numbers = excluded.winning_ticket_numbers,
 		prizes = excluded.prizes,
 		status = excluded.status,
-		ticket_count = excluded.ticket_count
+		ticket_count = excluded.ticket_count,
+		randomness_round = excluded.randomness_round
 WHERE giveaway.index = excluded.index`
 
 	winningTicketNumbersInt := make([]int32, 0)
@@ -140,9 +144,10 @@ WHERE giveaway.index = excluded.index`
 		string(prizesJSONBytes),
 		event.Status,
 		0,
+		nil,
 	)
 	if err != nil {
-		return fmt.Errorf("error while storing giveaway from event: %s", err)
+		return fmt.Errorf("error while storing giveaway from giveaway created event: %s", err)
 	}
 
 	return nil
@@ -150,4 +155,61 @@ WHERE giveaway.index = excluded.index`
 
 // -----------------------------------------------------------------------------
 
-// func (db *Db) ChangeFromEvent(event *giveawaytypes.GiveawayCreated) error {}
+func (db *Db) UpdateGiveawayFromWinnersDeterminationBegunEvent(event *giveawaytypes.GiveawayWinnersDeterminationBegun) error {
+	stmt := `UPDATE giveaway 
+	SET index = $1,
+		status = $2,
+		randomness_round = $3
+WHERE giveaway.index = $1`
+	fmt.Println("WINNERS DETERMINATION")
+	_, err := db.Sql.Exec(stmt,
+		event.GiveawayId,
+		1,
+		event.RandomnessRound,
+	)
+	if err != nil {
+		return fmt.Errorf("error while updating giveaway from winners determination begun event: %s", err)
+	}
+
+	return nil
+}
+
+// ---------------------------------------------------------------------------------------------------
+
+func (db *Db) UpdateGiveawayFromCancelledInsufTicketsEvent(event *giveawaytypes.GiveawayCancelledInsufTickets) error {
+	stmt := `UPDATE giveaway 
+    SET index = $1,
+		status = $2
+WHERE giveaway.index = $1`
+
+	_, err := db.Sql.Exec(stmt,
+		event.GiveawayId,
+		1,
+	)
+	if err != nil {
+		return fmt.Errorf("error while updating giveaway from cancelled insuf tickets event: %s", err)
+	}
+
+	return nil
+}
+
+// -------------------------------------------------------------------------------------------------------------------
+
+func (db *Db) UpdateGiveawayFromWinnersDeterminedEvent(event *giveawaytypes.GiveawayWinnersDetermined) error {
+	stmt := `UPDATE giveaway 
+    SET index = $1,
+		winning_ticket_numbers = $2
+WHERE giveaway.index = $1`
+
+	_, err := db.Sql.Exec(stmt,
+		event.GiveawayId,
+		event.WinnersNumbers,
+	)
+	if err != nil {
+		return fmt.Errorf("error while updating giveaway from cancelled insuf tickets event: %s", err)
+	}
+
+	return nil
+}
+
+// ------------------------------------------------------------------------------------------------------------------

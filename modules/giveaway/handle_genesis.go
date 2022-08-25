@@ -18,7 +18,7 @@ func (m *Module) HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json
 		return fmt.Errorf("error while unmarshaling staking state: %s", err)
 	}
 
-	err = m.db.SaveGiveawayList(genState.GiveawayList, genState.TicketCountList)
+	err = m.db.SaveGiveawayListFromGenesis(genState.GiveawayList, genState.TicketCountList)
 	if err != nil {
 		return fmt.Errorf("error while storing genesis giveaway list: %s", err)
 	}

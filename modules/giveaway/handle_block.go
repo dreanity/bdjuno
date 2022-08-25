@@ -35,10 +35,21 @@ func (m *Module) HandleBlock(
 
 		switch _msg := msg.(type) {
 		case *giveawaytypes.GiveawayCreated:
-			if err := m.db.SaveGiveawayFromEvent(_msg); err != nil {
+			if err := m.db.SaveGiveawayFromGiveawayCreatedEvent(_msg); err != nil {
 				return err
 			}
-
+		case *giveawaytypes.GiveawayWinnersDeterminationBegun:
+			if err := m.db.UpdateGiveawayFromWinnersDeterminationBegunEvent(_msg); err != nil {
+				return err
+			}
+		case *giveawaytypes.GiveawayCancelledInsufTickets:
+			if err := m.db.UpdateGiveawayFromCancelledInsufTicketsEvent(_msg); err != nil {
+				return err
+			}
+		case *giveawaytypes.GiveawayWinnersDetermined:
+			if err := m.db.UpdateGiveawayFromWinnersDeterminedEvent(_msg); err != nil {
+				return err
+			}
 		}
 	}
 
