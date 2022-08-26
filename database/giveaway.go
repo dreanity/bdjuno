@@ -279,3 +279,30 @@ WHERE giveaway.index = $1`
 }
 
 // ------------------------------------------------------------------------------------------------------------------
+
+func (db *Db) SaveTicketFromTicketCreatedEvent(event *giveawaytypes.TicketCreated) error {
+	stmtTicket := `INSERT INTO ticket (
+		index, 
+		giveaway_id,
+		participant_id,
+		participant_name
+	) VALUES (
+		$1,
+		$2,
+		$3,
+		$4
+	) ON CONFLICT DO NOTHING`
+
+	_, err := db.Sql.Exec(
+		stmtTicket,
+		event.Index,
+		event.GiveawayId,
+		event.ParticipantId,
+		event.ParticipantName,
+	)
+	if err != nil {
+		return fmt.Errorf("error while storing ticket: %s", err)
+	}
+
+	return nil
+}

@@ -50,6 +50,10 @@ func (m *Module) HandleBlock(
 			if err := m.db.UpdateGiveawayFromWinnersDeterminedEvent(_msg); err != nil {
 				return err
 			}
+		case *giveawaytypes.TicketCreated:
+			if err := m.db.SaveTicketFromTicketCreatedEvent(_msg); err != nil {
+				return err
+			}
 		}
 	}
 
