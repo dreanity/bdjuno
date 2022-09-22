@@ -1,0 +1,14 @@
+table:
+  name: randomness
+  schema: public
+select_permissions:
+- role: anonymous
+  permission:
+    columns:
+    - round
+    - round_time
+    - previous_signature
+    - randomness
+    - signature
+    filter: {}
+    allow_aggregations: true

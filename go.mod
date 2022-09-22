@@ -4,7 +4,7 @@ go 1.17
 
 require (
 	github.com/cosmos/cosmos-sdk v0.45.4
-	github.com/dreanity/saturn v0.0.0-20220823142140-6d473157d898
+	github.com/dreanity/saturn v0.0.0-20220905140936-6d0900b77b60
 	github.com/forbole/juno/v3 v3.3.0
 	github.com/go-co-op/gocron v1.16.2
 	github.com/gogo/protobuf v1.3.3
@@ -177,7 +177,7 @@ require (
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
-	google.golang.org/genproto v0.0.0-20220805133916-01dd62135a58 // indirect
+	google.golang.org/genproto v0.0.0-20220822174746-9e6da59bd2fc // indirect
 	google.golang.org/protobuf v1.28.1 // indirect
 	gopkg.in/ini.v1 v1.66.3 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect

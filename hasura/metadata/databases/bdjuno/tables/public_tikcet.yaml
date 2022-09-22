@@ -1,0 +1,13 @@
+table:
+  name: ticket
+  schema: public
+select_permissions:
+- role: anonymous
+  permission:
+    columns:
+    - giveaway_id
+    - index
+    - participant_id
+    - participant_name
+    filter: {}
+    allow_aggregations: true

@@ -1,0 +1,19 @@
+table:
+  name: giveaway
+  schema: public
+select_permissions:
+- role: anonymous
+  permission:
+    columns:
+    - winning_ticket_numbers
+    - completion_height
+    - created_at
+    - duration
+    - randomness_round
+    - index
+    - ticket_count
+    - prizes
+    - status
+    - name
+    filter: {}
+    allow_aggregations: true

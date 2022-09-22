@@ -1,0 +1,13 @@
+table:
+  name: randomness_chain_info
+  schema: public
+select_permissions:
+- role: anonymous
+  permission:
+    columns:
+    - genesis_time
+    - period
+    - hash
+    - public_key
+    filter: {}
+    allow_aggregations: true
