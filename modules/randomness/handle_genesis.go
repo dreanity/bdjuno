@@ -17,7 +17,7 @@ func (m *Module) HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json
 	var genState randomnesstypes.GenesisState
 	err := m.cdc.UnmarshalJSON(appState[randomnesstypes.ModuleName], &genState)
 	if err != nil {
-		return fmt.Errorf("error while unmarshaling staking state: %s", err)
+		return fmt.Errorf("error while unmarshaling randomness state: %s", err)
 	}
 
 	err = m.db.SaveRandomnessChainInfo(genState.ChainInfo)

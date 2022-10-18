@@ -29,8 +29,10 @@ import (
 	"github.com/forbole/bdjuno/v3/modules/mint"
 	"github.com/forbole/bdjuno/v3/modules/modules"
 	"github.com/forbole/bdjuno/v3/modules/pricefeed"
+	"github.com/forbole/bdjuno/v3/modules/profile"
 	"github.com/forbole/bdjuno/v3/modules/randomness"
 	"github.com/forbole/bdjuno/v3/modules/staking"
+	"github.com/forbole/bdjuno/v3/modules/treasury"
 )
 
 // UniqueAddressesParser returns a wrapper around the given parser that removes all duplicated addresses
@@ -85,6 +87,8 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 	govModule := gov.NewModule(sources.GovSource, authModule, distrModule, mintModule, slashingModule, stakingModule, cdc, db)
 	randomnessModule := randomness.NewModule(cdc, db)
 	giveawayModule := giveaway.NewModule(cdc, db)
+	profileModule := profile.NewModule(cdc, db)
+	treasuryModule := treasury.NewModule(cdc, db)
 
 	return []jmodules.Module{
 		messages.NewModule(r.parser, cdc, ctx.Database),
@@ -105,5 +109,7 @@ func (r *Registrar) BuildModules(ctx registrar.Context) jmodules.Modules {
 		stakingModule,
 		randomnessModule,
 		giveawayModule,
+		profileModule,
+		treasuryModule,
 	}
 }

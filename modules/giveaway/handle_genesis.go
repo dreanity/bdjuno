@@ -15,7 +15,7 @@ func (m *Module) HandleGenesis(doc *tmtypes.GenesisDoc, appState map[string]json
 	var genState giveawaytypes.GenesisState
 	err := m.cdc.UnmarshalJSON(appState[giveawaytypes.ModuleName], &genState)
 	if err != nil {
-		return fmt.Errorf("error while unmarshaling staking state: %s", err)
+		return fmt.Errorf("error while unmarshaling giveaway state: %s", err)
 	}
 
 	err = m.db.SaveGiveawayListFromGenesis(genState.GiveawayList, genState.TicketCountList)

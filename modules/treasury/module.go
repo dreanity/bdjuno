@@ -1,4 +1,4 @@
-package profile
+package treasury
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -28,5 +28,5 @@ func NewModule(
 }
 
 func (m *Module) Name() string {
-	return "profile"
+	return "treasury"
 }
