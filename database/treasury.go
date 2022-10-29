@@ -159,7 +159,7 @@ WHERE gas_bid.chain = excluded.chain`
 		event.BidNumber,
 	)
 	if err != nil {
-		return fmt.Errorf("error while storing giveaway from giveaway created event: %s", err)
+		return fmt.Errorf("error while setting gas bid from gas executed event: %s", err)
 	}
 
 	return nil

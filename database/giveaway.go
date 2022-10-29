@@ -35,6 +35,7 @@ func (db *Db) saveGiveawayList(paramsNumber int, giveawayList []giveawaytypes.Gi
 
 	stmt := `INSERT INTO giveaway (
 		index, 
+		creator,
 		duration, 
 		created_at, 
 		name, 
@@ -49,8 +50,8 @@ func (db *Db) saveGiveawayList(paramsNumber int, giveawayList []giveawaytypes.Gi
 	var params []interface{}
 	for i, giveaway := range giveawayList {
 		ai := i * paramsNumber
-		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),",
-			ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8, ai+9, ai+10)
+		stmt += fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d, $%d),",
+			ai+1, ai+2, ai+3, ai+4, ai+5, ai+6, ai+7, ai+8, ai+9, ai+10, ai+11)
 
 		winningTicketNumbersInt := make([]int32, 0)
 
@@ -73,6 +74,7 @@ func (db *Db) saveGiveawayList(paramsNumber int, giveawayList []giveawaytypes.Gi
 		params = append(
 			params,
 			giveaway.Index,
+			giveaway.Creator,
 			giveaway.Duration,
 			giveaway.CreatedAt,
 			giveaway.Name,
@@ -158,6 +160,7 @@ func (db *Db) saveTicketList(paramsNumber int, ticketList []giveawaytypes.Ticket
 func (db *Db) SaveGiveawayFromGiveawayCreatedEvent(event *giveawaytypes.GiveawayCreated) error {
 	stmt := `INSERT INTO giveaway (
 		index, 
+		creator,
 		duration, 
 		created_at, 
 		name, 
@@ -167,9 +170,10 @@ func (db *Db) SaveGiveawayFromGiveawayCreatedEvent(event *giveawaytypes.Giveaway
 		status,
 		ticket_count,
 		randomness_round
-	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+	) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 ON CONFLICT (index) DO UPDATE 
     SET index = excluded.index,
+		creator = excluded.creator,
         duration = excluded.duration,
 		created_at = excluded.created_at,
 		name = excluded.name,
@@ -194,6 +198,7 @@ WHERE giveaway.index = excluded.index`
 
 	_, err = db.Sql.Exec(stmt,
 		event.Index,
+		event.Creator,
 		event.Duration,
 		event.CreatedAt,
 		event.Name,
